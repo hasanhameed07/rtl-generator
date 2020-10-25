@@ -149,7 +149,7 @@ Source:
 Output:
 ```css
 .rtl .margin-of-four {
-    margin: 0 20px 10px 40px;
+    margin: 0 20px 40px 10px;
 }
 .rtl .margin-both {
     margin-right: 5px;
