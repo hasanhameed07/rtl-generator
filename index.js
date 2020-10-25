@@ -21,22 +21,48 @@ const RTL_PARENT_CLASS = '.rtl ';
  * options:
  * inputFiles: array[string] (required)
  * outputFile: string (optional)
+ * rtlParentClass: string
+ * returnOutputOnly: boolean (for debugging purpose)
  */
 module.exports = function (options) {
-  const inputFilesPromises = options.inputFiles.map(file => convert({...options, inputFile: file}));
-  for (const result of inputFilesPromises) {
-    await result;
-  }
-  return true;
+  return new Promise(async (resolve, reject) => {
+    if (!options || !options.inputFiles) {
+      reject('No input file provided for conversion.');
+      return;
+    }
+    if (!options.rtlParentClass) {
+      options.rtlParentClass = RTL_PARENT_CLASS;
+    }
+    const results = [];
+    let i = 0;
+    for (const file of options.inputFiles) {
+      generateFormatedFile(file);
+      results[i] = await convert({...options, inputFile: file});
+      removeFormatedFile(file);
+      i++;
+    }
+    resolve(results);
+  });
 };
 
+function generateFormatedFile(file) {
+  const fileData = fs.readFileSync(file, {encoding:'utf8', flag:'r'}); 
+  const formated = beautify(fileData, { format: 'css' });
+  fs.writeFileSync(file.replace('.css', '-temp.css'), formated);
+}
+
+function removeFormatedFile(file) {
+  fs.unlinkSync(file.replace('.css', '-temp.css'));
+}
+
 function convert(options) {
-  new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       if (!options.inputFile) {
         reject('No input file provided for conversion.');
         return;
       }
+      const inputFile = options.inputFile.replace('.css', '-temp.css');
       let originalFile = '';
       let selectorCache = '';
       let areChangesMade = false;
@@ -45,7 +71,7 @@ function convert(options) {
       let areChangesMadeInsideMediaQuery = false;
       let insideMediaQuery = false;
 
-      let output = `${EOL}/* RTL Generated auto utility by [HH] */${EOL}`;
+      let output = `${EOL}/* css from rtl-generator - [https://github.com/hasanhameed07/rtl-generator] */${EOL}`;
       let prevLines = '';
 
       const rl = readline(options.inputFile);
@@ -62,7 +88,7 @@ function convert(options) {
 
         if (!line.trim() || line.match(/\/\*(.*)\*\//g)) {
           // remove empty line or single line comment
-          if (line.trim() === '/*hh-skip-rtl-conversion-next-line*/') {
+          if (line.trim() === '/*skip-rtl-conversion-below-line*/') {
             skipNextLineFlip = true;
           }
           return;
@@ -117,6 +143,7 @@ function convert(options) {
           if (!mediaQueryEndReached) {
             const lastBrackOpen = prevLines.lastIndexOf('{');
             [
+              paddingLeftRightInBlock,
               marginLeftRightInBlock,
               positionLeftRightInBlock,
               borderLeftRightInBlock,
@@ -151,8 +178,12 @@ function convert(options) {
       })
         .on('close', (e) => {
           const data = beautify(output, { format: 'css' });
-          if (!options.outputFile) {
-            fs.appendFileSync(options.outputFile, data);
+          if (options.returnOutputOnly) {
+            resolve(data);
+            return;
+          }
+          else if (!options.outputFile) {
+            fs.appendFileSync(inputFile, data);
           }
           else {
             fs.writeFileSync(options.outputFile, data);
@@ -253,6 +284,34 @@ function marginLeftRightInBlock(line, selectorCache, areChangesMade) {
     }
     if (!matchedLeft) {
       selectorCache += `${TAB}margin-right: unset;${EOL}`;
+      areChangesMade = true;
+    }
+  }
+  return { selectorCache, areChangesMade };
+}
+
+function paddingLeftRightInBlock(line, selectorCache, areChangesMade) {
+  const matchedLeft = line.match(/padding-left: (-)?\d{0,4}(px|rem|em|%|auto|0)/g);
+  const matchedRight = line.match(/padding-right: (-)?\d{0,4}(px|rem|em|%|auto|0)/g);
+  if (matchedLeft) {
+    const pixelsLeft = matchedLeft[0].match(PX_MATCH_REGEX);
+    if (pixelsLeft) {
+      selectorCache += `${TAB}padding-right:${pixelsLeft[0]};${EOL}`;
+      areChangesMade = true;
+    }
+    if (!matchedRight) {
+      selectorCache += `${TAB}padding-left: unset;${EOL}`;
+      areChangesMade = true;
+    }
+  }
+  if (matchedRight) {
+    const pixelsRight = matchedRight[0].match(PX_MATCH_REGEX);
+    if (pixelsRight) {
+      selectorCache += `${TAB}padding-left:${pixelsRight[0]};${EOL}`;
+      areChangesMade = true;
+    }
+    if (!matchedLeft) {
+      selectorCache += `${TAB}padding-right: unset;${EOL}`;
       areChangesMade = true;
     }
   }
