@@ -8,16 +8,18 @@ This utility generates only the code which is modified for rtl. Unlike the `css-
 ## Features
 
 - Generate only converted rtl code required for proper right-to-left UI.
-- Handles and preserves css inside *media queries* for responsiveness.
+- Handles and preserves css inside _media queries_ for responsiveness.
 - Provide multiple input files
 - Output, Append or Write to a new file
+
+<img width="400" alt="Screenshot 2020-10-25 at 11 23 14 PM" src="https://user-images.githubusercontent.com/3350923/97117213-76a4ab80-16bf-11eb-90cf-2d0e8a47e483.png"><img width="400" alt="Screenshot 2020-10-25 at 11 22 58 PM" src="https://user-images.githubusercontent.com/3350923/97117220-7c9a8c80-16bf-11eb-8cdd-8d8fc8442544.png">
 
 ## How it works
 
 1. Install the npm utility
 2. Require it in your nodejs project or create a new index.html for conversion
 3. Provide input ltr css files 
-4. Thats it! The rtl css code will be appended to the input source files with a parent .rtl class. 
+4. Thats it! The rtl css code will be appended to the input source files with a parent .rtl class. In order to allow a user switch from ltr to rtl provide him a button which will add a .rtl class on the body.
 
 ## Installation
 
@@ -116,6 +118,30 @@ Source:
 .margin-both {
   margin-left: 5px;
   margin-right: 10px;
+}  
+@media (min-width: 576px) {
+    .header_top .col-sm-6:first-child {
+        display: inline-block;
+        float: left;
+      }
+      .header_top .col-sm-6:last-child {
+        display: inline-block;
+        float: right;
+      }
+}
+@media all and (min-width: 992px) and (max-width: 1199px) and (max-width: 480px) {
+    .list-group-horizontal-sm {
+        -webkit-box-orient: horizontal;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+        flex-direction: row;
+    }
+
+    .list-group-horizontal-sm .list-group-item+.list-group-item.active {
+        margin-left: -1px;
+        border-left-width: 1px;
+    }
+    
 }
 ```
 
@@ -127,6 +153,23 @@ Output:
 .rtl .margin-both {
     margin-right: 5px;
     margin-left: 10px;
+}
+@media (min-width: 576px) {
+    .rtl .header_top .col-sm-6:first-child {
+        float: right;
+    }
+
+    .rtl .header_top .col-sm-6:last-child {
+        float: left;
+    }
+}
+@media all and (min-width: 992px) and (max-width: 1199px) and (max-width: 480px) {
+    .rtl .list-group-horizontal-sm .list-group-item+.list-group-item.active {
+        margin-right: -1px;
+        margin-left: unset;
+        border-right-width: 1px;
+        border-left-width: unset;
+    }
 }
 ```
 
