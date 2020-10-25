@@ -74,7 +74,7 @@ function convert(options) {
       let output = `${EOL}/* css from rtl-generator - [https://github.com/hasanhameed07/rtl-generator] */${EOL}`;
       let prevLines = '';
 
-      const rl = readline(options.inputFile);
+      const rl = readline(inputFile);
 
 
       rl.on('line', (line, lineCount, byteCount) => {
