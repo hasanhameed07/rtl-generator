@@ -1,7 +1,7 @@
 # rtl-generator
 A utility to convert any existing left-to-right written css files into right-to-left css.
 
-Suppose you have a website in English (left-to-right) and now you want a way to save manual work by means of automatically generating a right-to-left css. 
+Suppose you have a website in English (left-to-right) and now you want a way to save manual work and use this utility to automatically generating a right-to-left css which will allow your users to switch. 
 
 This utility generates only the code which is modified for rtl. Unlike the `css-flip` from Twitter which generates css files containing all the untouched css.
 
@@ -9,6 +9,7 @@ This utility generates only the code which is modified for rtl. Unlike the `css-
 
 - Generate only converted rtl code required for proper right-to-left UI.
 - Handles and preserves css inside _media queries_ for responsiveness.
+- Can Handle minified css files as well
 - Provide multiple input files
 - Output, Append or Write to a new file
 
