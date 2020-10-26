@@ -130,6 +130,7 @@ function convert(options) {
         if (!areChangesMade) { ({ selectorCache, areChangesMade } = floatRightToLeft(line, selectorCache, areChangesMade)); }
         if (!areChangesMade) { ({ selectorCache, areChangesMade } = marginOfFour(line, selectorCache, areChangesMade)); }
         if (!areChangesMade) { ({ selectorCache, areChangesMade } = paddingOfFour(line, selectorCache, areChangesMade)); }
+        if (!areChangesMade) { ({ selectorCache, areChangesMade } = boxShadowRTL(line, selectorCache, areChangesMade)); }
 
         if (areChangesMade && insideMediaQuery) {
           areChangesMadeInsideMediaQuery = true;
@@ -453,6 +454,23 @@ function borderWidthLeftRightInBlock(line, selectorCache, areChangesMade) {
     }
     if (!matchedLeft) {
       selectorCache += `${TAB}border-right-width: unset;${EOL}`;
+      areChangesMade = true;
+    }
+  }
+  return { selectorCache, areChangesMade };
+}
+
+function boxShadowRTL(line, selectorCache, areChangesMade) {
+  const matched = line.match(/(box-shadow:((((((-)?\d+px)\s?){0,4}(#[0-9a-f]{3,6}\s?)?(inset)?),?)*||(inherit)||(none)))/g);
+  if (matched) {
+    const pixels = line.match(PX_MATCH_REGEX);
+    if (pixels.length > 0 && pixels[0].includes('px')) {
+      const regex= new RegExp('[0-9]+px');
+      selectorCache += line.replace(regex, '-' + pixels[0]) + EOL;
+      areChangesMade = true;
+    }
+    else{
+      selectorCache += line + EOL;
       areChangesMade = true;
     }
   }
