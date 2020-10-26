@@ -13,6 +13,7 @@ const VALUE_MATCH_REGEX = /:((?!;).)*/g;
 const EOL = '\r\n';
 const TAB = '  ';
 const RTL_PARENT_CLASS = '.rtl ';
+const BOX_SHADOW_MATCH_REGEX = /box-shadow:((((((-)?\d+px)\s?){0,4}(#[0-9a-f]{3,6}\s?)?(inset)?),?)*||(inherit)||(none))/g;
 
 /*
  * By default it appends the converted css to the input files provided
