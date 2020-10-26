@@ -1,0 +1,29 @@
+/*
+@media (min-device-width: 320px) and (max-device-width: 480px) {
+    main {
+        min-width: 320px;
+    }
+}
+
+@media (min-device-width: 480px) and (max-device-width: 600px) {
+    main {
+        min-width: 480px;
+    }
+}
+
+@media (min-device-width: 600px) and (max-device-width: 768px) {
+    main {
+        min-width: 600px;
+    }
+}
+
+@media (min-device-width: 768px) and (max-device-width: 1024px) {
+    main {
+        min-width: 768px;
+    }
+}
+*/
+
+.float-none {
+    float: left;
+}

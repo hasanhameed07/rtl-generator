@@ -1,0 +1,8 @@
+/* css from rtl-generator - [https://github.com/hasanhameed07/rtl-generator] */
+.rtl .float-left {
+    float: right;
+}
+
+.rtl .float-right {
+    float: left;
+}
