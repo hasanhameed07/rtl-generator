@@ -10,7 +10,7 @@ This utility generates only the code which is modified for rtl. Unlike the `css-
 - Generate only converted rtl code required for proper right-to-left UI.
 - Handles and preserves css inside _media queries_ for responsiveness.
 - Can Handle minified css files as well
-- Provide multiple input files
+- Provide multiple input files or Folder path to convert all css and scss within the path
 - Output, Append or Write to a new file
 
 <img width="400" alt="Screenshot 2020-10-25 at 11 23 14 PM" src="https://user-images.githubusercontent.com/3350923/97117213-76a4ab80-16bf-11eb-90cf-2d0e8a47e483.png"><img width="400" alt="Screenshot 2020-10-25 at 11 22 58 PM" src="https://user-images.githubusercontent.com/3350923/97117220-7c9a8c80-16bf-11eb-8cdd-8d8fc8442544.png">
@@ -107,6 +107,7 @@ Output:
  * outputFile: string (optional)
  * rtlParentClass: string (default: .rtl)
  * returnOutputOnly: boolean (default: false) // do not write to any file instead return the output
+ * folderPath: string (optional; if provided, all the css and scss within the folder path will be converted) 
 
 
 ## Examples
