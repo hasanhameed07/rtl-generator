@@ -465,8 +465,7 @@ function boxShadowRTL(line, selectorCache, areChangesMade) {
   if (matched) {
     const pixels = line.match(PX_MATCH_REGEX);
     if (pixels.length > 0 && pixels[0].includes('px')) {
-      const regex= new RegExp('[0-9]+px');
-      selectorCache += line.replace(regex, '-' + pixels[0]) + EOL;
+      selectorCache += line.replace(PX_MATCH_REGEX, '-' + pixels[0]) + EOL;
       areChangesMade = true;
     }
     else{
