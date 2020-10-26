@@ -125,7 +125,11 @@ function convert(options) {
 
         // opening
         if (line.match(/\{/g)) {
-          if (line.match(/@media/g)) {
+          if (line.match(/@media/g) || line.match(/keyframes/g)) {
+            if (insideMediaQuery) {
+              reject('two media queries in file: ', originalFile);
+              return;
+            }
             insideMediaQuery = true;
             output += line + EOL;
           }
@@ -135,7 +139,7 @@ function convert(options) {
             const lastBrackClose = prevLines.lastIndexOf('}');
             const lastBrackStart = prevLinesMinusLastOpenBracket.lastIndexOf('{');
             const fromLastBracketClosed = prevLines.slice(lastBrackClose + 1);
-            if (fromLastBracketClosed.match(/@media/g)) {
+            if (fromLastBracketClosed.match(/@media/g) || fromLastBracketClosed.match(/keyframes/g)) {
               selectorCache += lastBrackStart > -1 ? prevLines.slice(lastBrackStart + 1) : line + EOL;
             }
             else {
