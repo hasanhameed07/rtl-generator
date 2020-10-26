@@ -3,6 +3,7 @@
  */
 const readline = require('linebyline'),
 fs = require('fs'),
+glob = require('glob'),
 beautify = require('beautify');
 
 /**
@@ -20,18 +21,22 @@ const RTL_PARENT_CLASS = '.rtl ';
  * 
  * options:
  * inputFiles: array[string] (required)
+ * folderPath: string (optional; if provided, all the css and scss within the folder path will be converted) 
  * outputFile: string (optional)
  * rtlParentClass: string
  * returnOutputOnly: boolean (for debugging purpose)
  */
 module.exports = function (options) {
   return new Promise(async (resolve, reject) => {
-    if (!options || !options.inputFiles) {
+    if (!options || (!options.inputFiles && !options.folderPath)) {
       reject('No input file provided for conversion.');
       return;
     }
     if (!options.rtlParentClass) {
       options.rtlParentClass = RTL_PARENT_CLASS;
+    }
+    if (options.folderPath) {
+      options.inputFiles = await getCssInFolder(options.folderPath);
     }
     const results = [];
     let i = 0;
@@ -45,14 +50,24 @@ module.exports = function (options) {
   });
 };
 
+function getCssInFolder(folder) {
+  return new Promise(async (resolve, reject) => {
+    glob(folder + '/**/*.css', {}, (err, cssFIles)=>{
+      glob(folder + '/**/*.scss', {}, (err, scssFiles)=>{
+        resolve([...cssFIles, ...scssFiles]);
+      });
+    });
+  });
+}
+
 function generateFormatedFile(file) {
   const fileData = fs.readFileSync(file, {encoding:'utf8', flag:'r'}); 
   const formated = beautify(fileData, { format: 'css' });
-  fs.writeFileSync(file.replace('.css', '-temp.css'), formated);
+  fs.writeFileSync(file.replace('.scss', '-temp.scss').replace('.css', '-temp.css'), formated);
 }
 
 function removeFormatedFile(file) {
-  fs.unlinkSync(file.replace('.css', '-temp.css'));
+  fs.unlinkSync(file.replace('.scss', '-temp.scss').replace('.css', '-temp.css'));
 }
 
 function convert(options) {
@@ -62,8 +77,8 @@ function convert(options) {
         reject('No input file provided for conversion.');
         return;
       }
-      const inputFile = options.inputFile.replace('.css', '-temp.css');
-      let originalFile = '';
+      const inputFile = options.inputFile.replace('.scss', '-temp.scss').replace('.css', '-temp.css')
+      let originalFile = options.inputFile;
       let selectorCache = '';
       let areChangesMade = false;
       let selectorsCountInsideMediaQuery = 0;
@@ -78,9 +93,6 @@ function convert(options) {
 
 
       rl.on('line', (line, lineCount, byteCount) => {
-        // do something with the line of text
-        originalFile += line + EOL;
-
         if (skipNextLineFlip) {
           skipNextLineFlip = false;
           return;
@@ -183,7 +195,7 @@ function convert(options) {
             return;
           }
           else if (!options.outputFile) {
-            fs.appendFileSync(inputFile, data);
+            fs.appendFileSync(originalFile, data);
           }
           else {
             fs.writeFileSync(options.outputFile, data);
