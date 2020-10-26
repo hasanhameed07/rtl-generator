@@ -21,6 +21,11 @@
   },
   "bin": {
     "generate": "./bin/index.js"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-files": "^1.4.0",
+    "mocha": "^8.2.0"
   }
 
 }

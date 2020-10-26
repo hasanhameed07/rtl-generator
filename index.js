@@ -3,6 +3,7 @@
  */
 const readline = require('linebyline'),
 fs = require('fs'),
+glob = require('glob'),
 beautify = require('beautify');
 
 /**
@@ -20,18 +21,22 @@ const RTL_PARENT_CLASS = '.rtl ';
  * 
  * options:
  * inputFiles: array[string] (required)
+ * folderPath: string (optional; if provided, all the css and scss within the folder path will be converted) 
  * outputFile: string (optional)
  * rtlParentClass: string
  * returnOutputOnly: boolean (for debugging purpose)
  */
 module.exports = function (options) {
   return new Promise(async (resolve, reject) => {
-    if (!options || !options.inputFiles) {
+    if (!options || (!options.inputFiles && !options.folderPath)) {
       reject('No input file provided for conversion.');
       return;
     }
     if (!options.rtlParentClass) {
       options.rtlParentClass = RTL_PARENT_CLASS;
+    }
+    if (options.folderPath) {
+      options.inputFiles = await getCssInFolder(options.folderPath);
     }
     const results = [];
     let i = 0;
@@ -45,14 +50,24 @@ module.exports = function (options) {
   });
 };
 
+function getCssInFolder(folder) {
+  return new Promise(async (resolve, reject) => {
+    glob(folder + '/**/*.css', {}, (err, cssFIles)=>{
+      glob(folder + '/**/*.scss', {}, (err, scssFiles)=>{
+        resolve([...cssFIles, ...scssFiles]);
+      });
+    });
+  });
+}
+
 function generateFormatedFile(file) {
   const fileData = fs.readFileSync(file, {encoding:'utf8', flag:'r'}); 
   const formated = beautify(fileData, { format: 'css' });
-  fs.writeFileSync(file.replace('.css', '-temp.css'), formated);
+  fs.writeFileSync(file.replace('.scss', '-temp.scss').replace('.css', '-temp.css'), formated);
 }
 
 function removeFormatedFile(file) {
-  fs.unlinkSync(file.replace('.css', '-temp.css'));
+  fs.unlinkSync(file.replace('.scss', '-temp.scss').replace('.css', '-temp.css'));
 }
 
 function convert(options) {
@@ -62,14 +77,15 @@ function convert(options) {
         reject('No input file provided for conversion.');
         return;
       }
-      const inputFile = options.inputFile.replace('.css', '-temp.css');
-      let originalFile = '';
+      const inputFile = options.inputFile.replace('.scss', '-temp.scss').replace('.css', '-temp.css')
+      let originalFile = options.inputFile;
       let selectorCache = '';
       let areChangesMade = false;
       let selectorsCountInsideMediaQuery = 0;
       let skipNextLineFlip = false;
       let areChangesMadeInsideMediaQuery = false;
       let insideMediaQuery = false;
+      let commentOpened = false;
 
       let output = `${EOL}/* css from rtl-generator - [https://github.com/hasanhameed07/rtl-generator] */${EOL}`;
       let prevLines = '';
@@ -78,9 +94,6 @@ function convert(options) {
 
 
       rl.on('line', (line, lineCount, byteCount) => {
-        // do something with the line of text
-        originalFile += line + EOL;
-
         if (skipNextLineFlip) {
           skipNextLineFlip = false;
           return;
@@ -93,13 +106,30 @@ function convert(options) {
           }
           return;
         }
+        // ignore multi-line comment starting
+        else if (line.match(/\/\*/g) && !line.match(/\*\//g)) {
+          commentOpened = true;
+          return;
+        }
+        //  multi-line comment ending
+        else if (!line.match(/\/\*/g) && line.match(/\*\//g)) {
+          commentOpened = false;
+          return;
+        }
+        else if (commentOpened) {
+          return;
+        }
 
         prevLines += line.trim()
           .replace(/( )*\{( )*/g, '{').replace(/( )*\}( )*/g, '}');  // for internal calculation
 
         // opening
         if (line.match(/\{/g)) {
-          if (line.match(/@media/g)) {
+          if (line.match(/@media/g) || line.match(/keyframes/g)) {
+            if (insideMediaQuery) {
+              reject('two media queries in file: ', originalFile);
+              return;
+            }
             insideMediaQuery = true;
             output += line + EOL;
           }
@@ -109,7 +139,7 @@ function convert(options) {
             const lastBrackClose = prevLines.lastIndexOf('}');
             const lastBrackStart = prevLinesMinusLastOpenBracket.lastIndexOf('{');
             const fromLastBracketClosed = prevLines.slice(lastBrackClose + 1);
-            if (fromLastBracketClosed.match(/@media/g)) {
+            if (fromLastBracketClosed.match(/@media/g) || fromLastBracketClosed.match(/keyframes/g)) {
               selectorCache += lastBrackStart > -1 ? prevLines.slice(lastBrackStart + 1) : line + EOL;
             }
             else {
@@ -183,7 +213,7 @@ function convert(options) {
             return;
           }
           else if (!options.outputFile) {
-            fs.appendFileSync(inputFile, data);
+            fs.appendFileSync(originalFile, data);
           }
           else {
             fs.writeFileSync(options.outputFile, data);

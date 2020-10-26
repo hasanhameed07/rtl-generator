@@ -1,0 +1,19 @@
+/* css from rtl-generator - [https://github.com/hasanhameed07/rtl-generator] */
+.rtl .margin-of-four {
+    margin: 0 20px 40px 10px;
+}
+
+.rtl .margin-right {
+    margin-left: 5px;
+    margin-right: unset;
+}
+
+.rtl .margin-left {
+    margin-right: 10px;
+    margin-left: unset;
+}
+
+.rtl .margin-both {
+    margin-right: 5px;
+    margin-left: 10px;
+}
