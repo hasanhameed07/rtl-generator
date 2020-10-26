@@ -23,4 +23,11 @@ describe('rtl-generator test cases', function () {
         });
         expect(result[0]).to.equal(file('./test/margin-rtl.css'));
     });
+    it('margin test', async function () {
+        const result = await rtlGenerator({
+            returnOutputOnly: true,
+            inputFiles: ['./test/comments.css']
+        });
+        expect(result[0]).to.equal(file('./test/comments-rtl.css'));
+    });
 });

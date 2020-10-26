@@ -85,6 +85,7 @@ function convert(options) {
       let skipNextLineFlip = false;
       let areChangesMadeInsideMediaQuery = false;
       let insideMediaQuery = false;
+      let commentOpened = false;
 
       let output = `${EOL}/* css from rtl-generator - [https://github.com/hasanhameed07/rtl-generator] */${EOL}`;
       let prevLines = '';
@@ -103,6 +104,19 @@ function convert(options) {
           if (line.trim() === '/*skip-rtl-conversion-below-line*/') {
             skipNextLineFlip = true;
           }
+          return;
+        }
+        // ignore multi-line comment starting
+        else if (line.match(/\/\*/g) && !line.match(/\*\//g)) {
+          commentOpened = true;
+          return;
+        }
+        //  multi-line comment ending
+        else if (!line.match(/\/\*/g) && line.match(/\*\//g)) {
+          commentOpened = false;
+          return;
+        }
+        else if (commentOpened) {
           return;
         }
 

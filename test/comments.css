@@ -25,5 +25,13 @@
 */
 
 .float-none {
+    /* some comment */
+    float: left;
+}
+
+.float-none {
+    /* some another
+     * comment 
+     */
     float: left;
 }
