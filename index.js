@@ -130,7 +130,7 @@ function convert(options) {
         if (!areChangesMade) { ({ selectorCache, areChangesMade } = floatRightToLeft(line, selectorCache, areChangesMade)); }
         if (!areChangesMade) { ({ selectorCache, areChangesMade } = marginOfFour(line, selectorCache, areChangesMade)); }
         if (!areChangesMade) { ({ selectorCache, areChangesMade } = paddingOfFour(line, selectorCache, areChangesMade)); }
-        if (!areChangesMade) { ({ selectorCache, areChangesMade } = boxShadowRTL(line, selectorCache, areChangesMade)); }
+        // if (!areChangesMade) { ({ selectorCache, areChangesMade } = boxShadowRTL(line, selectorCache, areChangesMade)); }
 
         if (areChangesMade && insideMediaQuery) {
           areChangesMadeInsideMediaQuery = true;
