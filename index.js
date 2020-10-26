@@ -243,7 +243,7 @@ function marginOfFour(line, selectorCache, areChangesMade) {
   if (matched) {
     const pixels = line.match(PX_MATCH_REGEX);
     if (pixels.length === 4) {
-      selectorCache += `${TAB}margin: ${pixels[0]} ${pixels[3]} ${pixels[1]} ${pixels[2]};${EOL}`;
+      selectorCache += `${TAB}margin: ${pixels[0]} ${pixels[3]} ${pixels[2]} ${pixels[1]};${EOL}`;
       areChangesMade = true;
     }
   }
