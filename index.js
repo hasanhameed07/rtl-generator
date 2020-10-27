@@ -3,13 +3,14 @@
  */
 const readline = require('linebyline'),
 fs = require('fs'),
+path = require('path'),
 glob = require('glob'),
 beautify = require('beautify');
 
 /**
  * Constants.
  */
-const PX_MATCH_REGEX = /(-)?\d{0,4}(px|rem|em|%|auto|0)/g;
+const PX_MATCH_REGEX = /(-)?[.0-9]{0,4}(px|rem|em|%|auto|0)/g;
 const VALUE_MATCH_REGEX = /:((?!;).)*/g;
 const EOL = '\r\n';
 const TAB = '  ';
@@ -86,8 +87,10 @@ function convert(options) {
       let areChangesMadeInsideMediaQuery = false;
       let insideMediaQuery = false;
       let commentOpened = false;
-
-      let output = `${EOL}/* css from rtl-generator - [https://github.com/hasanhameed07/rtl-generator] */${EOL}`;
+      let output = '';
+      const outputStart = `${EOL}${EOL}/* start-css-from rtl-generator - [https://github.com/hasanhameed07/rtl-generator] */${EOL}
+/* original-file: ${path.basename(originalFile)} */${EOL}`;
+      const outputEnd = `/* end-of-css-from rtl-generator original-file: ${path.basename(originalFile)} */${EOL}`;
       let prevLines = '';
 
       const rl = readline(inputFile);
@@ -164,6 +167,10 @@ function convert(options) {
           areChangesMadeInsideMediaQuery = true;
         }
 
+        if (areChangesMade) {
+          selectorCache = selectorCache.replace(/\!important;/g,';').replace(/;/g, '!important;');
+        }
+
         // selector ending
         if (line.match(/\}/g)) {
           // if end of media query
@@ -207,7 +214,11 @@ function convert(options) {
         }
       })
         .on('close', (e) => {
-          const data = beautify(output, { format: 'css' });
+          if (!output) {
+            resolve(true);
+            return;
+          }
+          const data = beautify(outputStart + output + outputEnd, { format: 'css' });
           if (options.returnOutputOnly) {
             resolve(data);
             return;
@@ -216,7 +227,7 @@ function convert(options) {
             fs.appendFileSync(originalFile, data);
           }
           else {
-            fs.writeFileSync(options.outputFile, data);
+            fs.appendFileSync(options.outputFile, data);
           }
           resolve(true);
         })
@@ -298,22 +309,22 @@ function marginLeftRightInBlock(line, selectorCache, areChangesMade) {
   if (matchedLeft) {
     const pixelsLeft = matchedLeft[0].match(PX_MATCH_REGEX);
     if (pixelsLeft) {
-      selectorCache += `${TAB}margin-right:${pixelsLeft[0]};${EOL}`;
+      selectorCache += `${TAB}margin-right:${pixelsLeft[0]} !important;${EOL}`;
       areChangesMade = true;
     }
     if (!matchedRight) {
-      selectorCache += `${TAB}margin-left: unset;${EOL}`;
+      selectorCache += `${TAB}margin-left: unset !important;${EOL}`;
       areChangesMade = true;
     }
   }
   if (matchedRight) {
     const pixelsRight = matchedRight[0].match(PX_MATCH_REGEX);
     if (pixelsRight) {
-      selectorCache += `${TAB}margin-left:${pixelsRight[0]};${EOL}`;
+      selectorCache += `${TAB}margin-left:${pixelsRight[0]} !important;${EOL}`;
       areChangesMade = true;
     }
     if (!matchedLeft) {
-      selectorCache += `${TAB}margin-right: unset;${EOL}`;
+      selectorCache += `${TAB}margin-right: unset !important;${EOL}`;
       areChangesMade = true;
     }
   }
@@ -326,22 +337,22 @@ function paddingLeftRightInBlock(line, selectorCache, areChangesMade) {
   if (matchedLeft) {
     const pixelsLeft = matchedLeft[0].match(PX_MATCH_REGEX);
     if (pixelsLeft) {
-      selectorCache += `${TAB}padding-right:${pixelsLeft[0]};${EOL}`;
+      selectorCache += `${TAB}padding-right:${pixelsLeft[0]} !important;${EOL}`;
       areChangesMade = true;
     }
     if (!matchedRight) {
-      selectorCache += `${TAB}padding-left: unset;${EOL}`;
+      selectorCache += `${TAB}padding-left: unset !important;${EOL}`;
       areChangesMade = true;
     }
   }
   if (matchedRight) {
     const pixelsRight = matchedRight[0].match(PX_MATCH_REGEX);
     if (pixelsRight) {
-      selectorCache += `${TAB}padding-left:${pixelsRight[0]};${EOL}`;
+      selectorCache += `${TAB}padding-left:${pixelsRight[0]} !important;${EOL}`;
       areChangesMade = true;
     }
     if (!matchedLeft) {
-      selectorCache += `${TAB}padding-right: unset;${EOL}`;
+      selectorCache += `${TAB}padding-right: unset !important;${EOL}`;
       areChangesMade = true;
     }
   }
@@ -354,22 +365,22 @@ function positionLeftRightInBlock(line, selectorCache, areChangesMade) {
   if (matchedLeft) {
     const pixelsLeft = matchedLeft[0].match(PX_MATCH_REGEX);
     if (pixelsLeft) {
-      selectorCache += `${TAB}right:${pixelsLeft[0]};${EOL}`;
+      selectorCache += `${TAB}right:${pixelsLeft[0]} !important;${EOL}`;
       areChangesMade = true;
     }
     if (!matchedRight) {
-      selectorCache += `${TAB}left: unset;${EOL}`;
+      selectorCache += `${TAB}left: unset !important;${EOL}`;
       areChangesMade = true;
     }
   }
   if (matchedRight) {
     const pixelsRight = matchedRight[0].match(PX_MATCH_REGEX);
     if (pixelsRight) {
-      selectorCache += `${TAB}left:${pixelsRight[0]};${EOL}`;
+      selectorCache += `${TAB}left:${pixelsRight[0]} !important;${EOL}`;
       areChangesMade = true;
     }
     if (!matchedLeft) {
-      selectorCache += `${TAB}right: unset;${EOL}`;
+      selectorCache += `${TAB}right: unset !important;${EOL}`;
       areChangesMade = true;
     }
   }

@@ -1,9 +1,30 @@
-/* css from rtl-generator - [https://github.com/hasanhameed07/rtl-generator] */
+/* start-css-from rtl-generator - [https://github.com/hasanhameed07/rtl-generator] */
+
+/* original-file: keyframes.css */
 @keyframes hingeLeft {
+}
+
+@-webkit-keyframes slideDown {
+}
+
+@-moz-keyframes slideDown {
+}
+
+@-o-keyframes slideDown {
 }
 
 @keyframes slideDown {
 }
 
+@-webkit-keyframes slideUp {
+}
+
+@-moz-keyframes slideUp {
+}
+
+@-o-keyframes slideUp {
+}
+
 @keyframes slideUp {
 }
+/* end-of-css-from rtl-generator original-file: keyframes.css */

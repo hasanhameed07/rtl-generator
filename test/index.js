@@ -5,7 +5,6 @@ const chaiFiles = require('chai-files');
 chai.use(chaiFiles);
 const file = chaiFiles.file;
 const rtlGenerator = require('../index');
-const fs = require('fs');
 
 describe('rtl-generator test cases', function () {
     it('keyframes test', async function () {

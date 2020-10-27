@@ -1,8 +1,11 @@
-/* css from rtl-generator - [https://github.com/hasanhameed07/rtl-generator] */
+/* start-css-from rtl-generator - [https://github.com/hasanhameed07/rtl-generator] */
+
+/* original-file: comments.css */
 .rtl .float-none {
-    float: right;
+    float: right !important;
 }
 
 .rtl .float-none {
-    float: right;
+    float: right !important;
 }
+/* end-of-css-from rtl-generator original-file: comments.css */
