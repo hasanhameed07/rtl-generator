@@ -1,6 +1,6 @@
 {
   "name": "rtl-generator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A utility to convert any existing left-to-right written css files into right-to-left css automatically.",
   "main": "index.js",
   "scripts": {
