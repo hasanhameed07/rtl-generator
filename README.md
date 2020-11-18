@@ -55,7 +55,7 @@ Write rtl to a new css file
 var rtlGenerator = require('rtl-generator');
 const result = await rtlGenerator({
     inputFiles: ['./ltr/style.css', './ltr/style-more.css'],
-    outputFile: ['./ltr/style-rtl-combined.css']
+    outputFile: './ltr/style-rtl-combined.css'
 });
 ```
 
